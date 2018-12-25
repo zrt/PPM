@@ -12,6 +12,11 @@ type PathTracing struct {
 	SavePath string
 }
 
+type renderResult struct {
+	Pos   PixelPos
+	Color V
+}
+
 const TRACEDEPLIMIT = 10000
 const WEIGHTEPS = 0.0001
 
@@ -51,9 +56,9 @@ func Trace(pt *PathTracing, r *Ray, dep int, weight float64) V {
 	return c
 }
 
-func PathTracingWorker(pt *PathTracing, p PixelPos, c chan RenderResult) {
+func PathTracingWorker(pt *PathTracing, p PixelPos, c chan renderResult) {
 	ray := pt.Camera.Look(p.Cx, p.Cy)
-	result := RenderResult{p, Trace(pt, &ray, TRACEDEPLIMIT, 1.0)}
+	result := renderResult{p, Trace(pt, &ray, TRACEDEPLIMIT, 1.0)}
 	c <- result
 }
 
@@ -69,7 +74,7 @@ func (pt *PathTracing) Render() {
 	go pt.Sampler.GenPixelList(pixelList)
 	fmt.Println(lenPixelList, "pixels")
 
-	c := make(chan RenderResult, 32)
+	c := make(chan renderResult, 32)
 
 	go func() {
 		for i := 0; i < lenPixelList; i++ {

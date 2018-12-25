@@ -38,12 +38,14 @@ func main() {
 	light2 := Ball{V{0, 2, 3}, 0.5, LightMaterial(Grey(1)), "L2"}
 	world.AddLight([]Object{light, light2})
 
-	camera := Camera{V{0, 0, 3}, V{0, 0, -1}, 2, 2}
-
 	size := 500
-	sampler := SamplerBalanced{size, size}
+	camera := Camera{V{0, 0, 3}, V{0, 0, -1}, 2, 2, size, size}
 
-	renderer := PathTracing{world, camera, sampler, "test.png"}
-	renderer.Render()
+	// sampler := SamplerBalanced{size, size}
+
+	// renderer := PathTracing{world, camera, sampler, "test.png"}
+	// renderer.Render()
+	pm := NewPhotonMapping(world, camera, "test.png")
+	pm.Render()
 
 }

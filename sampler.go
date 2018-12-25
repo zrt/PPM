@@ -1,5 +1,7 @@
 package PPM
 
+// todo 此文件存在合理性存疑
+
 type Sampler interface {
 	Shape() (int, int) // output shape
 	GenPixelList(chan PixelPos)
