@@ -14,6 +14,6 @@ func (c *Camera) Look(a, b int) *Ray {
 	x = (x - 0.5) * c.W
 	y = (y - 0.5) * c.H
 	r.Dir = c.Ori.Add(V{1, 0, 0}.Mul(x)).Add(V{0, -1, 0}.Mul(y)).Norm()
-	r.Pos = c.Pos
+	r.Pos = c.Pos.Add(r.Dir.Mul(50)) // 焦距50
 	return &r
 }

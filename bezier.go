@@ -20,7 +20,7 @@ func (b Bezier) GetName() string {
 }
 
 func (t Bezier) GetNormal(v V) V {
-
+	return V{}
 }
 
 func NewBezier() *Bezier {

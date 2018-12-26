@@ -43,12 +43,12 @@ func main() {
 
 	size := 400
 	// camera := Camera{V{50, 48 - 3, 295.6}, V{0, 0, -1}, 0.5, 0.5, size, size}
-	camera := Camera{V{45, 50, 165}, V{0, 0, -1}, 1.3, 1.3, size, size}
+	camera := Camera{V{45, 40, 200}, V{0, 0, -1}, 1, 1, size, size}
 	// sampler := SamplerBalanced{size, size}
 
 	// renderer := PathTracing{world, camera, sampler, "test.png"}
 	// renderer.Render()
 	pm := NewPhotonMapping(world, camera, "test.png")
-	pm.Render(10000)
+	pm.Render(1000)
 
 }
