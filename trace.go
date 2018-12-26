@@ -119,11 +119,16 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 			pm.hitpoints.PushFront(hp)
 		} else {
 			// photon
-			for e := pm.hitpoints.Front(); e != nil; e = e.Next() {
+			//cnt_all := 0
+			//cnt_hit := 0
+			pm.lock.Lock()
+			for e := pm.table.GetTable(x).Front(); e != nil; e = e.Next() {
+				//cnt_all++
 				hp := e.Value.(*HPoint)
 				v = hp.pos.Sub(x)
 				// check normals to be closer than 90 degree (avoids some edge brightning)
 				if hp.nrm.Dot(n) > 1e-3 && v.Dot(v) < hp.r2 {
+					//cnt_hit++
 					g := (float64(hp.n)*(ALPHA) + (ALPHA)) / (float64(hp.n)*ALPHA + 1.0)
 					hp.r2 *= g
 					hp.n++
@@ -133,6 +138,11 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 					//fmt.Printf("\n%#v\n", hp)
 				}
 			}
+			pm.lock.Unlock()
+			//miss := 1 - float64(cnt_hit)/float64(cnt_all)
+			//if miss > 0.01 {
+			//	//fmt.Printf("\nmiss %.3f %s %v\n", miss, obj.GetName(), x)
+			//}
 			p := 0.
 			f := objMt.Color
 			if f.X > f.Y && f.X > f.Z {

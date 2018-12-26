@@ -65,6 +65,18 @@ func (v *V) Neg() V {
 	return V{-v.X, -v.Y, -v.Z}
 }
 
+func (v *V) Min_(u V) {
+	v.X = math.Min(v.X, u.X)
+	v.Y = math.Min(v.Y, u.Y)
+	v.Z = math.Min(v.Z, u.Z)
+}
+
+func (v *V) Max_(u V) {
+	v.X = math.Max(v.X, u.X)
+	v.Y = math.Max(v.Y, u.Y)
+	v.Z = math.Max(v.Z, u.Z)
+}
+
 func (v V) Sub(v2 V) V {
 	return V{v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z}
 }

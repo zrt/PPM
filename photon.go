@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,8 @@ type PhotonMapping struct {
 	path      string
 	img       Image
 	hitpoints *list.List
+	table     *HashTable
+	lock      sync.Mutex
 }
 
 type HPoint struct { // hit point
@@ -26,16 +29,16 @@ type HPoint struct { // hit point
 }
 
 func NewPhotonMapping(world World, camera Camera, path string) *PhotonMapping {
-	pm := &PhotonMapping{world, camera, path, Image{}, list.New()}
+	pm := &PhotonMapping{world, camera, path, Image{}, list.New(), nil, *new(sync.Mutex)}
 	pm.img.Init(camera.X, camera.Y)
 	return pm
 }
 
-func (pm *PhotonMapping) Pass1() {
+func (pm *PhotonMapping) Pass1() (cnt int, irad float64) {
 
 	bar := Pbar{}
 	bar.Init(pm.camera.X * pm.camera.Y)
-
+	fmt.Println("calc hitpoints...")
 	for i := 0; i < pm.camera.X; i++ {
 		for j := 0; j < pm.camera.Y; j++ {
 			pm.Trace(pm.camera.Look(i, j), 0, false, *NewV(0, 0, 0), *NewV(1, 1, 1), i*pm.camera.Y+j)
@@ -48,6 +51,7 @@ func (pm *PhotonMapping) Pass1() {
 
 	mx := V{-1e20, -1e20, -1e20}
 	mn := V{1e20, 1e20, 1e20}
+	cnt = 0
 	for e := pm.hitpoints.Front(); e != nil; e = e.Next() {
 		hp := e.Value.(*HPoint)
 		mn.X = math.Min(mn.X, hp.pos.X)
@@ -56,16 +60,29 @@ func (pm *PhotonMapping) Pass1() {
 		mx.X = math.Max(mx.X, hp.pos.X)
 		mx.Y = math.Max(mx.Y, hp.pos.Y)
 		mx.Z = math.Max(mx.Z, hp.pos.Z)
+		cnt++
 	}
+
 	ssize := mx.Sub(mn)
-	irad := (ssize.X + ssize.Y + ssize.Z) / 3. / ((float64(pm.camera.X + pm.camera.Y)) / 2.0) * 2.0
+	fmt.Print("SIZE: ")
+	ssize.Print()
+	irad = (ssize.X + ssize.Y + ssize.Z) / 3. / ((float64(pm.camera.X + pm.camera.Y)) / 2.0) * 2.0
+
+	pm.table = NewHashTable(pm.hitpoints, cnt, irad)
+	fmt.Println("hitpoints num:", cnt)
+
+	bar.Init(cnt)
+
 	for e := pm.hitpoints.Front(); e != nil; e = e.Next() {
 		hp := e.Value.(*HPoint)
 		//println(hp.pos.X, hp.pos.Y, hp.pos.Z)
 		hp.r2 = irad * irad
 		hp.n = 0
 		hp.flux = V{}
+		bar.Tick()
 	}
+	fmt.Println("\nfinish pass1..")
+	return
 }
 
 func (pm *PhotonMapping) genPhoton() (*Ray, *V) {
@@ -82,14 +99,28 @@ func (pm *PhotonMapping) genPhoton() (*Ray, *V) {
 }
 
 func (pm *PhotonMapping) Pass2(photonNum int) {
+	fmt.Println("pass2..")
 	bar := Pbar{}
 	bar.Init(photonNum)
 
-	for i := 0; i < photonNum; i++ {
-		ray, flux := pm.genPhoton()
-		pm.Trace(ray, 0, true, *flux, *NewV(1, 1, 1), -1)
-		bar.Tick()
+	c := make(chan int, 32)
+
+	const gnum = 10000
+	for i := 0; i < photonNum; i += gnum {
+		for j := 0; j < gnum; j++ {
+			go func() {
+				ray, flux := pm.genPhoton()
+				pm.Trace(ray, 0, true, *flux, *NewV(1, 1, 1), -1)
+				c <- i
+			}()
+		}
+
+		for j := 0; j < gnum; j++ {
+			<-c
+			bar.Tick()
+		}
 	}
+
 	fmt.Println()
 	// density estimation
 
@@ -106,11 +137,12 @@ func (pm *PhotonMapping) Render(photonNum int) {
 
 	photonNum *= 1000
 	startT := time.Now()
-	pm.Pass1()
+	cnt, r := pm.Pass1()
 	pass1T := time.Since(startT)
 	pm.Pass2(photonNum)
 	pass2T := time.Since(startT) - pass1T
 
-	pm.img.DebugSave("debug_"+pm.path, fmt.Sprint("algo:pm, p_num:", photonNum, ", time:", pass1T, "|", pass2T)) // debug
+	pm.img.DebugSave("debug_"+pm.path, fmt.Sprint("algorithm:ppm, p_num:", photonNum/1000, "\n", "time:", pass1T, "|", pass2T, "\n",
+		"hitpoints:", cnt, " R:", r)) // debug
 	pm.img.Save(pm.path)
 }

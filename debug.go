@@ -10,6 +10,7 @@ import (
 	"image/png"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -55,8 +56,6 @@ func (img *Image) DebugSave(path string, cmt string) {
 		runtime.GOOS,
 		runtime.GOARCH,
 		fmt.Sprint(runtime.NumCPU())+" cpus",
-		runtime.Version(),
-		runtime.GOROOT(),
 	)
 	sImg := image.NewRGBA(image.Rect(0, 0, img.X, img.Y))
 	for i := 0; i < img.X; i++ {
@@ -66,9 +65,13 @@ func (img *Image) DebugSave(path string, cmt string) {
 		}
 	}
 
-	addLabel(sImg, 5, 13, fmt.Sprintln(time.Now(), sImg.Bounds().Size()))
-	addLabel(sImg, 5, 26, info)
-	addLabel(sImg, 5, 39, cmt)
+	addLabel(sImg, 5, 13*1, fmt.Sprintln(time.Now()))
+	addLabel(sImg, 5, 13*2, fmt.Sprintln(sImg.Bounds().Size()))
+	addLabel(sImg, 5, 13*3, info)
+	addLabel(sImg, 5, 13*4, runtime.Version()+os.Getenv("GOPATH"))
+	for i, c := range strings.Split(cmt, "\n") {
+		addLabel(sImg, 5, 13*(5+i), c)
+	}
 
 	f, err := os.Create(path)
 	if err != nil {
