@@ -30,6 +30,11 @@ func (v V) Norm() V {
 	return V{v.X / len, v.Y / len, v.Z / len}
 }
 
+func (u *V) Cross(v *V) V {
+	// (Yu*Zv – Zu*Yv)*i + (Zu*Xv – Xu*Zv)j + (Xu*Yv – Yu*Xv)k;
+	return V{u.Y*v.Z - u.Z*v.Y, u.Z*v.X - u.X*v.Z, u.X*v.Y - u.Y*v.X}
+}
+
 func (v *V) Print() {
 	fmt.Printf("(%.2f, %.2f, %.2f)\n", v.X, v.Y, v.Z)
 }
@@ -44,7 +49,7 @@ func (v *V) Add_(v2 V) {
 	v.Z += v2.Z
 }
 
-func (v *V) Mulv(v2 *V) V {
+func (v *V) Mulv(v2 V) V {
 	return V{v.X * v2.X, v.Y * v2.Y, v.Z * v2.Z}
 }
 
@@ -60,14 +65,10 @@ func (v *V) Neg() V {
 	return V{-v.X, -v.Y, -v.Z}
 }
 
-func (v *V) Sub(v2 V) V {
+func (v V) Sub(v2 V) V {
 	return V{v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z}
 }
 
-func Grey(k float64) V {
-	return V{k, k, k}
-}
-
-func NewV(x, y, z float64) V {
-	return V{x, y, z}
+func NewV(x, y, z float64) *V {
+	return &V{x, y, z}
 }

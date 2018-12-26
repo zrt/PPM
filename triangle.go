@@ -7,19 +7,14 @@ type Triangle struct {
 }
 
 // 是否相交，交点
-func (t Triangle) Collide(r *Ray) (bool, V) {
-	return false, V{}
+func (t Triangle) Collide(r *Ray) (bool, float64) {
+	return false, -1.
 }
 
 // 取得局部颜色(PT)
 func (t Triangle) GetLocalColor() V {
 	// todo
 	return t.Mat.Color
-}
-
-// 取得材料透射、折射率
-func (t Triangle) GetMaterialWRWT() (float64, float64) {
-	return t.Mat.WR, t.Mat.WT
 }
 
 // 获得反射光线(在已经相交时)
