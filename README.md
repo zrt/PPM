@@ -42,19 +42,20 @@ func main() {
 	// https://en.wikipedia.org/wiki/Cornell_box
 
 	world := World{}
-	v := *NewV(0.99, 0.99, 0.99)
-	c1 := *NewV(.75, .75, .75)
-	c2 := *NewV(.25, .25, .75)
-	c3 := *NewV(.75, .25, .25)
+	v := V{0.99, 0.99, 0.99}
+	c1 := V{.75, .75, .75}
+	c2 := V{.25, .25, .75}
+	c3 := V{.75, .25, .25}
 
-	b1Material2 := MirrorMaterial(v)
-	b2Material2 := DiffuseMaterial(v)
-	b3Material2 := GlassMaterial(v)
+	mm := MirrorMaterial(v)
+	dm := DiffuseMaterial(v)
+	gm := GlassMaterial(v)
 
-	ball := Ball{V{27, 16.5, 47}, 16.5, b1Material2, "ball1_mirror"}
-	ball2 := Ball{V{50, 8.5, 60}, 8.5, b2Material2, "ball2_diff"}
-	ball3 := Ball{V{73, 16.5, 88}, 16.5, b3Material2, "ball2_glass"}
+	ball := Ball{V{27, 16.5, 47}, 16.5, mm, "ball1_mirror"}
+	ball2 := Ball{V{50, 8.5, 60}, 8.5, dm, "ball2_diff"}
+	ball3 := Ball{V{73, 16.5, 88}, 16.5, gm, "ball2_glass"}
 	tri := NewTriangle(V{73, 40, 88}, V{50, 50, 60}, V{27, 16.5, 47}, DiffuseMaterial(c2), "triangle")
+
 	world.Add([]Object{ball, ball2, ball3, tri})
 
 	R := 1e5
@@ -78,7 +79,7 @@ func main() {
 }
 ```
 
-![example](https://github.com/zrt/PPM/raw/master/_history/t6.png)
+![example](https://github.com/zrt/PPM/blob/master/_history/t6.png)
 
 ## Links
 
