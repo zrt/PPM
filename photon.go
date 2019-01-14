@@ -12,13 +12,14 @@ import (
 const ALPHA = 0.7
 
 type PhotonMapping struct {
-	world     World
-	camera    Camera
-	path      string
-	img       Image
-	hitpoints *list.List
-	table     *HashTable
-	lock      sync.Mutex
+	world        World
+	camera       *Camera
+	path         string
+	img          Image
+	hitpoints    *list.List
+	table        *HashTable
+	lock         sync.Mutex
+	antiAliasing int
 }
 
 type HPoint struct { // hit point
@@ -28,8 +29,10 @@ type HPoint struct { // hit point
 	pix               int
 }
 
-func NewPhotonMapping(world World, camera Camera, path string) *PhotonMapping {
-	pm := &PhotonMapping{world, camera, path, Image{}, list.New(), nil, *new(sync.Mutex)}
+func NewPhotonMapping(world World, camera *Camera, path string, antiAliasing int) *PhotonMapping {
+	pm := &PhotonMapping{world, camera, path, Image{}, list.New(), nil, *new(sync.Mutex), antiAliasing}
+	camera.X *= antiAliasing
+	camera.Y *= antiAliasing
 	pm.img.Init(camera.X, camera.Y)
 	return pm
 }
@@ -144,5 +147,7 @@ func (pm *PhotonMapping) Render(photonNum int) {
 
 	pm.img.DebugSave("debug_"+pm.path, fmt.Sprint("algorithm:ppm, p_num:", photonNum/1000, "\n", "time:", pass1T, "|", pass2T, "\n",
 		"hitpoints:", cnt, " R:", r)) // debug
-	pm.img.Save(pm.path)
+	pm.img.Save("full_" + pm.path)
+	pm.img.SaveSmall(pm.path, pm.antiAliasing)
+
 }

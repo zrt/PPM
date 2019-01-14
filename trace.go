@@ -1,12 +1,26 @@
 package PPM
 
 import (
+	//"crypto/rand"
 	"fmt"
 	"math"
 	"math/rand"
 )
 
 const TRACEDEPLIMIT = 20 // 最大trace深度
+
+func randFloat64() float64 {
+	return rand.Float64()
+}
+
+//
+//func randFloat64() float64 {
+//	rint, err := rand.Int(rand.Reader, big.NewInt(1<<20))
+//	if err != nil {
+//		panic(err)
+//	}
+//	return float64((*rint).Int64()) / float64(1<<20)
+//}
 
 // Eye Trace/ Photon Trace
 func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix int) {
@@ -84,7 +98,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 			pm.Trace(rr, dep, photon, flux, fa.Mul(1.-Re), pix)
 		} else {
 			// photon
-			if rand.Float64() < P {
+			if randFloat64() < P {
 				pm.Trace(lr, dep, photon, flux, fa, pix)
 			} else {
 				pm.Trace(rr, dep, photon, flux, fa, pix)
@@ -93,8 +107,8 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 	} else if objMt.T == MT_DIFF {
 		// diffuse
 		//println("lala")
-		r1 := 2. * math.Pi * rand.Float64()
-		r2 := rand.Float64()
+		r1 := 2. * math.Pi * randFloat64()
+		r2 := randFloat64()
 		r2s := math.Sqrt(r2)
 		w := nl
 		u := V{}
@@ -147,7 +161,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 			} else {
 				p = f.Z
 			}
-			if rand.Float64() < p {
+			if randFloat64() < p {
 				pm.Trace(&Ray{x, d}, dep, photon, flux.Mulv(f).Mul(1./p), adj, pix)
 			}
 		}

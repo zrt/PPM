@@ -60,3 +60,33 @@ func (img *Image) Save(path string) {
 		panic(err)
 	}
 }
+
+func (img *Image) SaveSmall(path string, ratio int) {
+	sImg := image.NewRGBA(image.Rect(0, 0, img.X/ratio, img.Y/ratio))
+	tmp := 1. / float64(ratio*ratio)
+	for i := 0; i < img.X/ratio; i++ {
+		for j := 0; j < img.Y/ratio; j++ {
+			r, g, b := 0., 0., 0.
+			for k1 := 0; k1 < ratio; k1++ {
+				for k2 := 0; k2 < ratio; k2++ {
+					c := img.At(i*ratio+k1, j*ratio+k2)
+					r += tmp * c.X
+					g += tmp * c.Y
+					b += tmp * c.Z
+				}
+			}
+			sImg.Set(i, j, color.RGBA{toInt(r), toInt(g), toInt(b), 255})
+		}
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	err = png.Encode(f, sImg)
+	if err != nil {
+		panic(err)
+	}
+}

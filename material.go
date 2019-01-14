@@ -68,10 +68,6 @@ func (m Material) Color(v V) V {
 		if v < 0 {
 			v += dy
 		}
-		//if int(u) != 0 {
-		//	println(int(dx), int(dy), int(u), int(v), k)
-		//
-		//}
 		r, g, b, _ := (*m.Texture).At(int(u), int(v)).RGBA()
 		//println(r, g, b)
 		return *NewV(float64(r)/65535., float64(g)/65535., float64(b)/65535.)

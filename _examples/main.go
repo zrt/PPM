@@ -40,6 +40,6 @@ func main() {
 	长宽 := 400
 	相机 := Camera{V{45, 40, 200}, V{0, 0, -1}, 1, 1, 长宽, 长宽}
 
-	光子映射 := NewPhotonMapping(场景, 相机, "test.png")
+	光子映射 := NewPhotonMapping(场景, &相机, "test.png", 2)
 	光子映射.Render(1000)
 }
