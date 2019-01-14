@@ -23,7 +23,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 	if n.Dot(r.Dir) >= 0 {
 		nl = n.Mul(-1)
 	}
-	debugN := 1
+	debugN := -2
 	if pix == debugN {
 		fmt.Println()
 		r.Pos.Print()
@@ -36,14 +36,10 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 		x.Print()
 		fmt.Println()
 	}
-	//if obj.GetName() != "w_up" {
-	//
-	//	println(obj.GetName())
-	//}
 
 	if objMt.T == MT_SPEC {
 		// mirror
-		pm.Trace(&Ray{x, r.Dir.Sub(n.Mul(2).Mul(n.Dot(r.Dir)))}, dep, photon, flux.Mulv(objMt.Color), adj.Mulv(objMt.Color), pix)
+		pm.Trace(&Ray{x, r.Dir.Sub(n.Mul(2).Mul(n.Dot(r.Dir)))}, dep, photon, flux.Mulv(objMt.Color(x)), adj.Mulv(objMt.Color(x)), pix)
 	} else if objMt.T == MT_REFR {
 		// glass
 		lr := &Ray{x, r.Dir.Sub(n.Mul(2).Mul(n.Dot(r.Dir)))} // 反射光线
@@ -59,7 +55,6 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 		ddn := r.Dir.Dot(nl)
 		cos2t := 1 - nnt*nnt*(1-ddn*ddn)
 		if cos2t < 0 {
-			// total internal reflection
 			pm.Trace(lr, dep, photon, flux, adj, pix)
 			return
 		}
@@ -82,7 +77,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 		Re := R0 + (1-R0)*c*c*c*c*c
 		P := Re
 		rr := &Ray{x, td}
-		fa := objMt.Color.Mulv(adj)
+		fa := objMt.Color(x).Mulv(adj)
 		if !photon {
 			// eye
 			pm.Trace(lr, dep, photon, flux, fa.Mul(Re), pix)
@@ -112,7 +107,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 		d := (u.Mul(math.Cos(r1) * r2s).Add(v.Mul(math.Sin(r1) * r2s).Add(w.Mul(math.Sqrt(1 - r2))))).Norm()
 		if !photon {
 			// eye
-			hp := &HPoint{objMt.Color.Mulv(adj), x, n, V{}, 0, 0, pix}
+			hp := &HPoint{objMt.Color(x).Mulv(adj), x, n, V{}, 0, 0, pix}
 			if pix == debugN {
 				fmt.Printf("\n%#v\n", hp)
 			}
@@ -144,7 +139,7 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 			//	//fmt.Printf("\nmiss %.3f %s %v\n", miss, obj.GetName(), x)
 			//}
 			p := 0.
-			f := objMt.Color
+			f := objMt.Color(x)
 			if f.X > f.Y && f.X > f.Z {
 				p = f.X
 			} else if f.Y > f.Z {

@@ -49,7 +49,7 @@ func (v *V) Add_(v2 V) {
 	v.Z += v2.Z
 }
 
-func (v *V) Mulv(v2 V) V {
+func (v V) Mulv(v2 V) V {
 	return V{v.X * v2.X, v.Y * v2.Y, v.Z * v2.Z}
 }
 

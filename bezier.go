@@ -19,7 +19,7 @@ func (b Bezier) GetName() string {
 	return b.Name
 }
 
-func (t Bezier) GetNormal(v V) V {
+func (b Bezier) GetNormal(v V) V {
 	return V{}
 }
 
