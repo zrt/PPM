@@ -10,8 +10,8 @@ A [Progressive Photon Mapping](https://www.ci.i.u-tokyo.ac.jp/~hachisuka/ppm.pdf
 - [ ] Supports OBJ file
 - [x] Supports sphere
 - [x] Supports triangle
-- [ ] Supports bezier surface
-- [ ] Supports textures, bump maps and normal maps
+- [x] Supports bezier surface
+- [x] Supports textures, bump maps and normal maps
 - [ ] Polish API
 - [ ] Using pprof to improve performance
 - [ ] Supports SPPM(?)

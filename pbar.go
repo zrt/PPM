@@ -23,6 +23,8 @@ func (p *Pbar) Init(num int) {
 	p.now = 0
 }
 
+var tttt = 0
+
 func (p *Pbar) Step(now int, newline bool) {
 	p.now = now
 	if float64(now-p.lastPrint) >= outputEvery*float64(p.total) {
@@ -31,13 +33,21 @@ func (p *Pbar) Step(now int, newline bool) {
 		}
 		p.lastPrint = now
 		if newline {
-			fmt.Printf("\nprogress: %.1f%% (%d/%d), eta %.2fs",
+			tttt++
+			fmt.Printf("\n%c progress: %3.1f%% (%3d/%3d), used %4.2fs, eta %4.2fs, speed %4.2f/s",
+				"|/-\\"[tttt&3],
 				float64(now)/float64(p.total)*100, now, p.total,
-				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)))
+				time.Now().Sub(p.startTime).Seconds(),
+				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)),
+				float64(now)/time.Now().Sub(p.startTime).Seconds())
 		} else {
-			fmt.Printf("\rprogress: %.1f%% (%d/%d), eta %.2fs",
+			tttt++
+			fmt.Printf("\r%c progress: %3.1f%% (%3d/%3d), used %4.2fs, eta %4.2fs, speed %4.2f/s",
+				"|/-\\"[tttt&3],
 				float64(now)/float64(p.total)*100, now, p.total,
-				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)))
+				time.Now().Sub(p.startTime).Seconds(),
+				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)),
+				float64(now)/time.Now().Sub(p.startTime).Seconds())
 		}
 	}
 }
@@ -52,13 +62,21 @@ func (p *Pbar) Tick() {
 		}
 		p.lastPrint = now
 		if newline {
-			fmt.Printf("\nprogress: %.1f%% (%d/%d), eta %.2fs",
+			tttt++
+			fmt.Printf("\n%c progress: %3.1f%% (%3d/%3d), used %4.2fs, eta %4.2fs, speed %4.2f/s",
+				"|/-\\"[tttt&3],
 				float64(now)/float64(p.total)*100, now, p.total,
-				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)))
+				time.Now().Sub(p.startTime).Seconds(),
+				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)),
+				float64(now)/time.Now().Sub(p.startTime).Seconds())
 		} else {
-			fmt.Printf("\rprogress: %.1f%% (%d/%d), eta %.2fs",
+			tttt++
+			fmt.Printf("\r%c progress: %3.1f%% (%3d/%3d), used %4.2fs, eta %4.2fs, speed %4.2f/s",
+				"|/-\\"[tttt&3],
 				float64(now)/float64(p.total)*100, now, p.total,
-				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)))
+				time.Now().Sub(p.startTime).Seconds(),
+				float64(p.total-now)*(time.Now().Sub(p.startTime).Seconds()/float64(now)),
+				float64(now)/time.Now().Sub(p.startTime).Seconds())
 		}
 	}
 }

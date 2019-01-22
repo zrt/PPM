@@ -1,3 +1,6 @@
+tmp/
+tex/
+submit/
 pdf
 note.txt
 _examples/full_test.png

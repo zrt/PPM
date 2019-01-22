@@ -7,7 +7,7 @@ type Camera struct {
 	X, Y     int     // 输出图片大小
 }
 
-func (c *Camera) Look(a, b int) *Ray {
+func (c *Camera) Look(a, b int) *Ray { // k 0 ~ 1
 	x := float64(a) / float64(c.X-1)
 	y := float64(b) / float64(c.Y-1)
 	r := Ray{}

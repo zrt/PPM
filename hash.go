@@ -11,9 +11,19 @@ type HashTable struct {
 	r    float64
 }
 
+const HASHMAX = 1000000000
+
+func min(x, y int) int {
+	if x > y {
+		return y
+	} else {
+		return x
+	}
+}
+
 func NewHashTable(hp *list.List, num int, r float64) *HashTable {
 	r *= 2
-	t := &HashTable{make([]*list.List, 2*num), 2 * num, r}
+	t := &HashTable{make([]*list.List, min(2*num, HASHMAX)), min(2*num, HASHMAX), r}
 	for i := 0; i < t.N; i++ {
 		t.hash[i] = list.New()
 	}

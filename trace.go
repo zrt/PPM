@@ -25,14 +25,20 @@ func randFloat64() float64 {
 // Eye Trace/ Photon Trace
 func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix int) {
 	dep++
-	isCollide, dis, id := pm.world.Collide(r)
+	isCollide, dis, objp, normp := pm.world.Collide(r)
+	//println(isCollide, dis, objp)
 	if !isCollide || dep >= TRACEDEPLIMIT {
 		return
 	}
+	obj := *objp
 	x := r.Pos.Add(r.Dir.Mul(dis)) // 交点
-	obj := pm.world.Objects[id]    // 相交的obj
 	objMt := obj.GetMaterial()     // obj的材质
-	n := obj.GetNormal(x)          // 得到交点法向量
+	//println(obj.GetName())
+	n := *normp // 得到交点法向量
+	//n.Print()
+	//r.Dir.Print()
+	//r.Pos.Print()
+
 	nl := n
 	if n.Dot(r.Dir) >= 0 {
 		nl = n.Mul(-1)
@@ -40,14 +46,15 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 	debugN := -2
 	if pix == debugN {
 		fmt.Println()
+		println(obj.GetName())
 		r.Pos.Print()
 		r.Dir.Print()
+		n.Print()
+		x.Print()
 		println(dep)
 		println(photon)
 		flux.Print()
 		adj.Print()
-		println(obj.GetName())
-		x.Print()
 		fmt.Println()
 	}
 
@@ -113,11 +120,11 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 		w := nl
 		u := V{}
 		if math.Abs(w.X) > .1 {
-			u = NewV(0, 1, 0).Cross(&w).Norm()
+			u = NewV(0, 1, 0).Cross(w).Norm()
 		} else {
-			u = NewV(1, 0, 0).Cross(&w).Norm()
+			u = NewV(1, 0, 0).Cross(w).Norm()
 		}
-		v := w.Cross(&u)
+		v := w.Cross(u)
 		d := (u.Mul(math.Cos(r1) * r2s).Add(v.Mul(math.Sin(r1) * r2s).Add(w.Mul(math.Sqrt(1 - r2))))).Norm()
 		if !photon {
 			// eye
@@ -166,6 +173,6 @@ func (pm *PhotonMapping) Trace(r *Ray, dep int, photon bool, flux, adj V, pix in
 			}
 		}
 	} else {
-		panic(fmt.Errorf("unknown material type: %d, id: %d, name: %s", objMt.T, id, obj.GetName()))
+		panic(fmt.Errorf("unknown material type: %d, name: %s", objMt.T, obj.GetName()))
 	}
 }
